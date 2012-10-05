@@ -79,13 +79,30 @@
             value.Name.ShouldEqual("Chris");
         }
 
+        [Fact]
+        public void Can_update_a_value()
+        {
+            // Give
+            int i;
+            cacheStore.Store("test", 1);
+            cacheStore.Store("test", 2);
+            cacheStore.Store("test", 3);
+
+            // When
+            var result = cacheStore.TryLoad<int>("test", out i);
+
+            // Then
+            i.ShouldEqual(3);
+        }
+
         public void Dispose()
         {
             using (documentStore) { }
         }
     }
 
-    public class Person {
+    public class Person
+    {
 
         public string Name { get; set; }
 
