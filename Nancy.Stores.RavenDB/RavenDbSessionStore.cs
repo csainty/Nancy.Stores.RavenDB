@@ -20,7 +20,20 @@
 
         protected override void Save(string id, IDictionary<string, object> items)
         {
-            throw new NotImplementedException();
+            Guard.NotNullOrEmpty(() => id, id);
+            Guard.NotNull(() => items, items);
+
+            var session = new Models.Session
+            {
+                Id = Guid.Parse(id),
+                Items = items
+            };
+
+            using (var work = documentStore.OpenSession())
+            {
+                work.Store(session);
+                work.SaveChanges();
+            }
         }
 
         protected override bool TryLoad(string id, out IDictionary<string, object> items)

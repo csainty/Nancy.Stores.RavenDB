@@ -103,6 +103,43 @@
             items["test"].ShouldEqual("value");
             A.CallTo(() => documentSession.Load<Models.Session>(session.Id.ToString())).MustHaveHappened();
         }
+                
+        [Fact]
+        public void Save_should_throw_argumentnullexception_on_null_items() {
+            // When
+            var result = Record.Exception(() => sessionStore.SaveSession(BuildContextWithSession(Guid.NewGuid()), null));
+
+            // Then
+            result.ShouldBeType<ArgumentNullException>();       
+        }
+
+        [Fact]
+        public void Save_should_store_the_items_in_ravendb()
+        {
+            // Given
+            var sessionId = Guid.NewGuid();
+            var items = new Dictionary<string, object> { { "test", "value" } };
+
+            // When
+            sessionStore.SaveSession(BuildContextWithSession(sessionId), items);
+
+            // Then
+            A.CallTo(() => documentSession.Store(A<Models.Session>.That.Matches(s => s.Id == sessionId && s.Items.Count == 1 && String.Equals(s.Items["test"], "value")))).MustHaveHappened();
+        }
+
+        [Fact]
+        public void Save_should_call_savechanges_on_document_session()
+        {
+            // Given
+            var sessionId = Guid.NewGuid();
+            var items = new Dictionary<string, object> { { "test", "value" } };
+
+            // When
+            sessionStore.SaveSession(BuildContextWithSession(sessionId), items);
+
+            // Then
+            A.CallTo(() => documentSession.SaveChanges()).MustHaveHappened();
+        }
 
         private Request BuildRequestWithSession(Guid sessionId)
         {
@@ -113,6 +150,15 @@
 
             request.Cookies.Add(RavenDbSessionStore.CookieName, String.Format("{0}{1}", Convert.ToBase64String(hmacBytes), encryptedId));
             return request;
+        }
+
+        private NancyContext BuildContextWithSession(Guid sessionId)
+        {
+            var context = new NancyContext();
+            context.Request = BuildRequestWithSession(sessionId);
+            context.Response = new Response();
+
+            return context;
         }
     }
 }
