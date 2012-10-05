@@ -111,7 +111,7 @@
         public void Remove_should_remove_the_item_from_ravendb()
         {
             // Given
-            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(new CacheItem { Id = "id", Value = "value" });
+            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(CacheItem.Create("id", "value"));
 
             // When
             cacheStore.Remove("id");
@@ -124,7 +124,7 @@
         public void Remove_should_call_savechanges_on_ravendb()
         {
             // Given
-            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(new CacheItem { Id = "id", Value = "value" });
+            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(CacheItem.Create("id", "value"));
 
             // When
             cacheStore.Remove("id");
@@ -144,7 +144,7 @@
             cacheStore.Store(id, value);
 
             // Then
-            A.CallTo(() => documentSession.Store(A<CacheItem>.That.Matches(i => i.Id == id && (int)i.Value == value))).MustHaveHappened();
+            A.CallTo(() => documentSession.Store(A<CacheItem>.That.Matches(i => i.Id == id && i.GetValue<int>() == value))).MustHaveHappened();
         }
 
         [Fact]
@@ -178,7 +178,7 @@
         {
             // Given
             int _;
-            var item = new CacheItem { Id = "id", Value = 1 };
+            var item = CacheItem.Create("id", 1);
             A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(item);
 
             // When
@@ -193,7 +193,7 @@
         {
             // Given
             string item;
-            var cacheItem = new CacheItem { Id = "id", Value = "value" };
+            var cacheItem = CacheItem.Create("id", "value");
             A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(cacheItem);
 
             // When

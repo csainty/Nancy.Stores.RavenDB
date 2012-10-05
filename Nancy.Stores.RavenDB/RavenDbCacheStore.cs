@@ -1,6 +1,5 @@
 ﻿namespace Nancy.Stores.RavenDB
 {
-    using System;
     using Cache;
     using Nancy.Stores.RavenDB.Models;
     using Raven.Client;
@@ -35,7 +34,7 @@
         {
             Guard.NotNullOrEmpty(() => id, id);
 
-            var item = new CacheItem { Id = id, Value = obj };
+            var item = CacheItem.Create(id, obj);
 
             using (var session = documentStore.OpenSession()) {
                 session.Store(item);
@@ -54,8 +53,8 @@
                     obj = default(TItem);
                     return false;
                 }
-                
-                obj = (TItem)item.Value;
+
+                obj = item.GetValue<TItem>();
                 return true;
             }
         }
