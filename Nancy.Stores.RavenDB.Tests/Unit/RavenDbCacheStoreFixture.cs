@@ -132,5 +132,75 @@
             // Then
             A.CallTo(() => documentSession.SaveChanges()).MustHaveHappened();
         }
+
+        [Fact]
+        public void Store_should_store_the_document_in_ravendb()
+        {
+            // Given
+            var id = "123";
+            var value = 1;
+
+            // When
+            cacheStore.Store(id, value);
+
+            // Then
+            A.CallTo(() => documentSession.Store(A<CacheItem>.That.Matches(i => i.Id == id && (int)i.Value == value))).MustHaveHappened();
+        }
+
+        [Fact]
+        public void Store_should_call_save_changes_on_ravendb()
+        {
+            // Given
+
+            // When
+            cacheStore.Store("id", "value");
+
+            // Then
+            A.CallTo(() => documentSession.SaveChanges()).MustHaveHappened();
+        }
+
+        [Fact]
+        public void TryLoad_should_return_false_when_item_not_found()
+        {
+            // Given
+            string _;
+            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(null);
+
+            // When
+            bool result = cacheStore.TryLoad("id", out _);
+
+            // Then
+            result.ShouldBeFalse();
+        }
+
+        [Fact]
+        public void TryLoad_should_return_true_when_item_is_found()
+        {
+            // Given
+            int _;
+            var item = new CacheItem { Id = "id", Value = 1 };
+            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(item);
+
+            // When
+            bool result = cacheStore.TryLoad("id", out _);
+
+            // Then
+            result.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void TryLoad_should_set_the_loaded_item_in_the_out_parameter()
+        {
+            // Given
+            string item;
+            var cacheItem = new CacheItem { Id = "id", Value = "value" };
+            A.CallTo(() => documentSession.Load<CacheItem>("id")).Returns(cacheItem);
+
+            // When
+            cacheStore.TryLoad("id", out item);
+
+            // Then
+            item.ShouldEqual("value");
+        }
     }
 }

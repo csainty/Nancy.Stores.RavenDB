@@ -2,6 +2,7 @@
 {
     using System;
     using Cache;
+    using Nancy.Stores.RavenDB.Models;
     using Raven.Client;
 
     public class RavenDbCacheStore : ICacheStore
@@ -33,13 +34,30 @@
         public void Store(string id, object obj)
         {
             Guard.NotNullOrEmpty(() => id, id);
+
+            var item = new CacheItem { Id = id, Value = obj };
+
+            using (var session = documentStore.OpenSession()) {
+                session.Store(item);
+                session.SaveChanges();
+            }
         }
 
-        public bool TryLoad<T>(string id, out T obj)
+        public bool TryLoad<TItem>(string id, out TItem obj)
         {
             Guard.NotNullOrEmpty(() => id, id);
 
-            throw new NotImplementedException();
+            using (var session = documentStore.OpenSession()) {
+                var item = session.Load<CacheItem>(id);
+
+                if (item == null) {
+                    obj = default(TItem);
+                    return false;
+                }
+                
+                obj = (TItem)item.Value;
+                return true;
+            }
         }
     }
 }
