@@ -10,7 +10,8 @@
     {
         private readonly IDocumentStore documentStore;
 
-        public RavenDbSessionStore(CryptographyConfiguration cryptographyConfiguration, IDocumentStore documentStore) : base(cryptographyConfiguration)
+        public RavenDbSessionStore(CryptographyConfiguration cryptographyConfiguration, IDocumentStore documentStore)
+            : base(cryptographyConfiguration)
         {
             Guard.NotNull(() => documentStore, documentStore);
 
@@ -24,7 +25,19 @@
 
         protected override bool TryLoad(string id, out IDictionary<string, object> items)
         {
-            throw new NotImplementedException();
+            using (var work = documentStore.OpenSession())
+            {
+                var session = work.Load<Models.Session>(id);
+
+                if (null == session)
+                {
+                    items = new Dictionary<string, object>();
+                    return false;
+                }
+
+                items = session.Items;
+                return true;
+            }
         }
     }
 }
