@@ -1,6 +1,6 @@
 ﻿namespace Nancy.Stores.RavenDB.Models
 {
-    public class CacheModel
+    public class CacheItem
     {
         public string Id { get; set; }
 

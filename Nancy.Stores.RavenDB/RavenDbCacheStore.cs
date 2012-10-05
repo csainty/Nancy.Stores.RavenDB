@@ -1,7 +1,7 @@
 ﻿namespace Nancy.Stores.RavenDB
 {
     using System;
-    using Nancy.Cache;
+    using Cache;
     using Raven.Client;
 
     public class RavenDbCacheStore : ICacheStore
@@ -17,16 +17,28 @@
 
         public void Remove(string id)
         {
-            throw new NotImplementedException();
+            Guard.NotNullOrEmpty(() => id, id);
+
+            using (var session = documentStore.OpenSession()) {
+                var item = session.Load<Models.CacheItem>(id);
+
+                if (item != null)
+                {
+                    session.Delete(item);
+                    session.SaveChanges();
+                }
+            }
         }
 
         public void Store(string id, object obj)
         {
-            throw new NotImplementedException();
+            Guard.NotNullOrEmpty(() => id, id);
         }
 
         public bool TryLoad<T>(string id, out T obj)
         {
+            Guard.NotNullOrEmpty(() => id, id);
+
             throw new NotImplementedException();
         }
     }
