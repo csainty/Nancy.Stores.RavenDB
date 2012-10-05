@@ -56,8 +56,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\CacheModel.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="netfx\System\Guard.cs" />
+    <Compile Include="RavenDbCacheStore.cs" />
     <Compile Include="RavenDbSessionStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

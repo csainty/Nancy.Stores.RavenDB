@@ -110,6 +110,7 @@
     <Compile Include="Fakes\FakeCryptographyConfiguration.cs" />
     <Compile Include="Fakes\FakeEncryptionProvider.cs" />
     <Compile Include="Fakes\FakeHmacProvider.cs" />
+    <Compile Include="Unit\RavenDbCacheStoreFixture.cs" />
     <Compile Include="Unit\RavenDbSessionStoreFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
